@@ -20,7 +20,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-class TaskControllerTest {
+class TaskControllerTest
+{
 
     private static void setId(Object entity, long id)
     {
