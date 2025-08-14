@@ -1,0 +1,89 @@
+Enum role_enum {
+  ADMIN
+  MEMBER
+  OBSERVER
+}
+
+Enum task_status_enum {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
+Enum task_priority_enum {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+Enum history_event_enum {
+  CREATED
+  UPDATED
+  ASSIGNED
+  STATUS_CHANGED
+}
+
+Table users {
+  id            bigint [pk, increment]
+  username      varchar(100) [not null]
+  email         varchar(255) [not null, unique]
+  password_hash varchar(255) [not null]
+  created_at    timestamp [not null, default: `now()`]
+}
+
+Table projects {
+  id          bigint [pk, increment]
+  name        varchar(200) [not null]
+  description text
+  start_date  date [not null]
+  created_at  timestamp [not null, default: `now()`]
+}
+
+Table project_memberships {
+  id         bigint [pk, increment]
+  project_id bigint [not null]     // FK via Ref below
+  user_id    bigint [not null]     // FK via Ref below
+  role       role_enum [not null]
+
+  Indexes {
+    (project_id, user_id) [unique]
+    project_id [name: 'idx_memberships_project']
+  }
+}
+
+Table tasks {
+  id           bigint [pk, increment]
+  project_id   bigint [not null]   // FK via Ref below
+  name         varchar(200) [not null]
+  description  text
+  due_date     date
+  priority     task_priority_enum [not null, default: 'MEDIUM']
+  status       task_status_enum [not null, default: 'TODO']
+  assigned_to  bigint              // FK via Ref below, nullable
+  created_at   timestamp [not null, default: `now()`]
+  updated_at   timestamp [not null, default: `now()`]
+  completed_at timestamp
+
+  Indexes {
+    (project_id, status) [name: 'idx_tasks_project_status']
+  }
+}
+
+Table task_history {
+  id          bigint [pk, increment]
+  task_id     bigint [not null]    // FK via Ref below
+  event_type  history_event_enum [not null]
+  description text
+  changed_by  bigint               // nullable FK to users
+  created_at  timestamp [not null, default: `now()`]
+}
+
+/* Relationships + delete rules */
+Ref: project_memberships.project_id > projects.id [delete: cascade]
+Ref: project_memberships.user_id > users.id [delete: cascade]
+
+Ref: tasks.project_id > projects.id [delete: cascade]
+Ref: tasks.assigned_to > users.id [delete: set null]
+
+Ref: task_history.task_id > tasks.id [delete: cascade]
+Ref: task_history.changed_by > users.id
