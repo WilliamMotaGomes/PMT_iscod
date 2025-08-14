@@ -1,0 +1,8 @@
+<div class="card">
+    <h3>Connexion</h3>
+    <input [(ngModel)]="email" placeholder="email">
+    <input [(ngModel)]="password" type="password" placeholder="mot de passe">
+    <button class="btn" (click)="login()" [disabled]="loading">Se connecter</button>
+    <p style="opacity:.7">Compte deja existant : alice/william/paul&#64;example.com, mot de passe <em>password</em></p>
+    <p><a routerLink="/register">Créer un compte</a></p>
+</div>

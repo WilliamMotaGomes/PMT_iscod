@@ -1,0 +1,72 @@
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <h3>Créer un projet</h3>
+            <input [(ngModel)]="pname" placeholder="Nom"/>
+            <textarea [(ngModel)]="pdesc" placeholder="Description"></textarea>
+            <input [(ngModel)]="pstart" type="date"/>
+            <button class="btn" (click)="createProject()">Créer</button>
+        </div>
+
+        <div class="card">
+            <h3>Mes projets</h3>
+            <div *ngIf="projects.length===0"><em>Aucun projet</em></div>
+            <div *ngFor="let p of projects">
+                <button class="btn" (click)="onSelectProject(p.id)">#{{p.id}} — {{p.name}}</button>
+            </div>
+        </div>
+
+        <div *ngIf="projectId && canEdit" class="card">
+            <h3>Créer une tâche</h3>
+            <input [(ngModel)]="tname" placeholder="Nom"/>
+            <textarea [(ngModel)]="tdesc" placeholder="Description"></textarea>
+            <input [(ngModel)]="tdue" type="date"/>
+            <select [(ngModel)]="tprio">
+                <option value="LOW">LOW</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="HIGH">HIGH</option>
+            </select>
+            <button class="btn" (click)="createTask()" [disabled]="!canEdit">Ajouter</button>
+        </div>
+
+        <div *ngIf="projectId && canAdmin" class="card">
+            <h3>Administration</h3>
+            <div>
+                <strong>Inviter un membre</strong>
+                <input [(ngModel)]="inviteEmail" placeholder="email" [disabled]="!canAdmin">
+                <button class="btn" (click)="invite()" [disabled]="!canAdmin || !inviteEmail">Inviter</button>
+            </div>
+            <div style="margin-top:8px">
+                <strong>Membres</strong>
+                <div *ngFor="let m of membersList">
+                    {{m.user?.username || ('User#'+m.user?.id)}} —
+                    <select [ngModel]="m.role" (ngModelChange)="updateRole(m.user?.id, $event)" [disabled]="!canAdmin">
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="MEMBER">MEMBER</option>
+                        <option value="OBSERVER">OBSERVER</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <h3>Tableau des tâches <span *ngIf="projectId">(projet #{{projectId}})</span></h3>
+            <select [(ngModel)]="filterStatus" (change)="loadTasks()">
+                <option value="">Tout</option>
+                <option value="TODO">TODO</option>
+                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                <option value="DONE">DONE</option>
+            </select>
+            <div *ngIf="!projectId"><em>Sélectionne un projet pour voir les tâches.</em></div>
+            <div *ngFor="let t of tasks" class="card">
+                <div><strong>#{{t.id}}</strong> {{t.name}}</div>
+                <div class="status">{{t.status}}</div>
+                <div>Échéance: {{fmtDate(t.dueDate) || '-'}}</div>
+                <div>Date de fin: {{fmtDate(t.completedAt) || '-'}}</div>
+                <button class="btn" (click)="openTask(t.id)">Ouvrir</button>
+            </div>
+        </div>
+    </div>
+</div>

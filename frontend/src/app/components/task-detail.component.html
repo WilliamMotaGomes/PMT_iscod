@@ -1,0 +1,63 @@
+<div class="card">
+    <button class="btn" (click)="back()">← Retour</button>
+    <div *ngIf="task">
+        <h3>#{{task.id}} — {{task.name}}</h3>
+
+        <p *ngIf="!edit">{{task.description}}</p>
+        <div *ngIf="edit">
+            <input [(ngModel)]="form.name" placeholder="Nom">
+            <textarea [(ngModel)]="form.description" placeholder="Description"></textarea>
+            <input [(ngModel)]="form.dueDate" type="date">
+            <select [(ngModel)]="form.priority">
+                <option value="LOW">LOW</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="HIGH">HIGH</option>
+            </select>
+            <label>Date de fin</label>
+            <input [(ngModel)]="form.completedAt" type="date">
+            <div>
+                <button class="btn" (click)="save()" [disabled]="!canEdit">Enregistrer</button>
+                <button class="btn" (click)="cancel()">Annuler</button>
+            </div>
+        </div>
+
+        <div>Statut: <strong>{{task.status}}</strong> — Priorité: <strong>{{task.priority}}</strong></div>
+        <div>Échéance: {{fmtDate(task.dueDate) || '-'}}</div>
+        <div>Date de fin: {{fmtDate(task.completedAt) || '-'}}</div>
+        <div>Assignée à: {{task.assignedTo?.username || '-'}}</div>
+
+        <div class="row" style="margin-top:8px">
+            <div class="col">
+                <button class="btn" (click)="setStatus('TODO')" [disabled]="!canEdit || task.status==='TODO'">Revenir TODO</button>
+            </div>
+            <div class="col">
+                <button class="btn" (click)="setStatus('IN_PROGRESS')" [disabled]="!canEdit || task.status==='IN_PROGRESS'">Démarrer (IN_PROGRESS)</button>
+            </div>
+            <div class="col">
+                <button class="btn" (click)="setStatus('DONE')" [disabled]="!canEdit || task.status==='DONE'">Terminer (DONE)</button>
+            </div>
+            <div class="col">
+                <button class="btn" (click)="toggleEdit()" [disabled]="!canEdit">{{edit?'Fermer':'Modifier'}}</button>
+            </div>
+        </div>
+
+        <hr/>
+        <div class="card">
+            <h4>Assigner à</h4>
+            <select [(ngModel)]="assigneeId" [disabled]="!canAssign">
+                <option [value]="0">— choisir —</option>
+                <option *ngFor="let m of members" [value]="m.user?.id">{{m.user?.username || ('User#'+m.user?.id)}}</option>
+            </select>
+            <button class="btn" (click)="assign()" [disabled]="!canAssign || !assigneeId">Assigner</button>
+        </div>
+
+        <hr/>
+        <div class="card">
+            <h4>Historique</h4>
+            <div *ngIf="history.length===0"><em>Aucun historique</em></div>
+            <div *ngFor="let h of history" class="card">
+                {{renderDiff(h)}} — {{renderWhen(h)}}
+            </div>
+        </div>
+    </div>
+</div>
