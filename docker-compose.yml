@@ -19,9 +19,17 @@ services:
   backend:
     build: ./backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/pmt
-      SPRING_DATASOURCE_USERNAME: pmt
-      SPRING_DATASOURCE_PASSWORD: pmt
+      SPRING_DATASOURCE_URL: ${DB_URL:-jdbc:postgresql://db:5432/pmt}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-pmt}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-pmt}
+
+      APP_MAIL_FROM: ${APP_MAIL_FROM:-no-reply@pmt.local}
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-smtp.gmail.com}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-587}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME:-}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD:-}
+      SPRING_MAIL_SMTP_AUTH: ${SPRING_MAIL_SMTP_AUTH:-true}
+      SPRING_MAIL_STARTTLS: ${SPRING_MAIL_STARTTLS:-true}
 
     depends_on:
       db:
